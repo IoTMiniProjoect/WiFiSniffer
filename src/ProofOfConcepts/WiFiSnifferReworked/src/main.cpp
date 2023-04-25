@@ -47,6 +47,12 @@ struct wifi_ieee80211_packet
 //Function declarations
 void setup_alt();
 void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type);
+bool SetWiFiChannel(uint8_t channel);
+
+bool SetWiFiChannel(uint8_t channel)
+{
+    return esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE) == ESP_OK;
+}
 
 
 void setup_alt()
@@ -84,8 +90,6 @@ void setup()
 
     esp_wifi_set_promiscuous(true);
     esp_wifi_set_promiscuous_rx_cb(&PromiscuousPacketHandler);
-    //capture only promiscous via filter
-    //esp_wifi_set_promiscuous_filter()
 }
 
 void loop()

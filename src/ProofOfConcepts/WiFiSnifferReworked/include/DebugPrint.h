@@ -1,4 +1,5 @@
 #pragma once
+#include "Arduino.h"
 
 //Uncomment or define somewhere else to see debug messages
 #define DEBUG_MODE

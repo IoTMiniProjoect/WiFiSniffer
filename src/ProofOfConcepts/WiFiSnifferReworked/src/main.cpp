@@ -3,7 +3,7 @@
 #include "esp_wifi.h"
 #include "esp_wifi_types.h"
 // #include "esp_system.h"
-// #include "nvs_flash"
+//#include "nvs_flash.h"
 
 #include "WiFi.h"
 #include "DebugPrint.h"
@@ -64,6 +64,7 @@ void setup_alt()
 void setup()
 {
     Serial.begin(115200);
+    //ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
     DEBUG_PRINTLN("[+] esp_netif_init");
     //esp_event_loop_create_default();
@@ -83,10 +84,13 @@ void setup()
 
     esp_wifi_set_promiscuous(true);
     esp_wifi_set_promiscuous_rx_cb(&PromiscuousPacketHandler);
+    //capture only promiscous via filter
+    //esp_wifi_set_promiscuous_filter()
 }
 
 void loop()
 {
+    //Nothing runs here, event driven code
     // put your main code here, to run repeatedly:
     //delay(5 SECONDS);
 
@@ -101,7 +105,9 @@ void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type)
         return;
     }
 
-    const wifi_promiscuous_pkt_t *packet = static_cast<wifi_promiscuous_pkt_t *>(buffer);   //Note: use c-style cast if it doesn't work 
+    //const wifi_promiscuous_pkt_t *packet = static_cast<wifi_promiscuous_pkt_t *>(buffer);   //Note: use c-style cast if it doesn't work 
+    
+    const wifi_promiscuous_pkt_t *packet = (wifi_promiscuous_pkt_t *)buffer;   //Note: use c-style cast if it doesn't work 
 
     const wifi_ieee80211_packet *ieee8021Packet = (wifi_ieee80211_packet *)packet->payload;
     
@@ -136,3 +142,4 @@ void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type)
     
     DEBUG_PRINTLN(messageStream.str().data());
 }
+

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <vector>
+#include <set>
 #include "esp_wifi.h"
 
 // Structs
@@ -37,9 +39,12 @@ class WiFiSniffer
 {
     private:
         wifi_promiscuous_cb_t m_promiscuousPacketHandler;
+        static std::set<std::vector<uint8_t>> m_detectedMacs;   //Static cus it needs to be accessible by DefaultPromiscousPacketHandler, does not change much as the class is singleton anyway
 
         //Disalow outside creation
         WiFiSniffer() = default;
+
+        static void DefaultPromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type);
     public:
         WiFiSniffer(WiFiSniffer &other) = delete;
         void operator=(const WiFiSniffer & rVal) = delete;

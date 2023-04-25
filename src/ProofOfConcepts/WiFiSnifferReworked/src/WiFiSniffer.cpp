@@ -4,10 +4,10 @@
 #include "esp_wifi_types.h"
 // #include "esp_system.h"
 //#include "nvs_flash.h"
-
-//#include "WiFi.h"
 #include "DebugPrint.h"
+#include "MACTypeConverter.h"
 #include "sstream"
+#include "functional"
 
 //src-only function declarations
 void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type);
@@ -54,7 +54,10 @@ void WiFiSniffer::SetPromiscuousPacketHandlerCallbackFunction(wifi_promiscuous_c
 {
     if (callback == nullptr)
     {
-        m_promiscuousPacketHandler = &PromiscuousPacketHandler;
+        //TODO: fix mapping
+        //m_promiscuousPacketHandler = std::bind(&WiFiSniffer::DefaultPromiscuousPacketHandler, this, _1, _2);
+        m_promiscuousPacketHandler = &WiFiSniffer::DefaultPromiscuousPacketHandler;
+
     }
     else
     {
@@ -73,7 +76,7 @@ bool WiFiSniffer::SetWiFiChannel(uint8_t channel)
 }
 
 //Default handler
-void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type)
+void WiFiSniffer::DefaultPromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type)
 {
     if (type != WIFI_PKT_MGMT)
     {
@@ -93,24 +96,17 @@ void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type)
     }
 #endif
 
+    //Note: Untested
+    std::string receiverMac = MACTypeConverter::ToString(std::begin(header->addr1), std::end(header->addr1));
+
+    std::string senderMac = MACTypeConverter::ToString(std::begin(header->addr2), std::end(header->addr2));
+
     std::stringstream messageStream;
     messageStream << "Timestamp: " << packet->rx_ctrl.timestamp << '\n' <<
                      "Channel: " << packet->rx_ctrl.channel << '\n' <<
                      "RSSI: " << packet->rx_ctrl.rssi << '\n' << 
-                     "Receiver: " << std::hex << (int)header->addr1[0] << ":" 
-                                  << std::hex << (int)header->addr1[1] << ":"
-                                  << std::hex << (int)header->addr1[2] << ":"
-                                  << std::hex << (int)header->addr1[3] << ":"
-                                  << std::hex << (int)header->addr1[4] << ":"
-                                  << std::hex << (int)header->addr1[5] << '\n' <<
-                     "Sender: " << std::hex << (int)header->addr2[0] << ":" 
-                                  << std::hex << (int)header->addr2[1] << ":"
-                                  << std::hex << (int)header->addr2[2] << ":"
-                                  << std::hex << (int)header->addr2[3] << ":"
-                                  << std::hex << (int)header->addr2[4] << ":"
-                                  << std::hex << (int)header->addr2[5];
-                     
-
+                     "Receiver: " << receiverMac << '\n' <<
+                     "Sender: " << senderMac;
     
     DEBUG_PRINTLN(messageStream.str().data());
 }

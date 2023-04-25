@@ -1,14 +1,4 @@
 #include <Arduino.h>
-// //#include "freertos/FreeRTOS.h"
-// #include "esp_wifi.h"
-// #include "esp_wifi_types.h"
-// // #include "esp_system.h"
-// //#include "nvs_flash.h"
-
-// #include "WiFi.h"
-// #include "DebugPrint.h"
-// #include "string"
-// #include "sstream"
 
 #include "WiFiSniffer.h"
 

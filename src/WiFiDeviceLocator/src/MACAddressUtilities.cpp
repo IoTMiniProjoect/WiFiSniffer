@@ -1,7 +1,7 @@
 #include "MACAddressUtilities.h"
 #include "DebugPrint.h"
 
-bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> &mac)
+bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> mac)
 {
     uint8_t macMSB = mac[0];
     //x_2, x_6, x_A, x_E => randomized mac

@@ -45,6 +45,9 @@ class WiFiSniffer
         WiFiSniffer() = default;
 
         static void DefaultPromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type);
+
+        //TODO: Add a MAC Handler class?
+    
     public:
         WiFiSniffer(WiFiSniffer &other) = delete;
         void operator=(const WiFiSniffer & rVal) = delete;

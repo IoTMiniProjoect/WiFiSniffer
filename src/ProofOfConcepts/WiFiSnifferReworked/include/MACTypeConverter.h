@@ -7,7 +7,7 @@
 namespace MACTypeConverter
 {
     std::vector<uint8_t> GetVectorFromString(const std::string &macAddress);
-    std::vector<uint8_t> GetVectorFromArray(const uint8_t (&macArray)[6]);   //Assumed size of 6
+    std::vector<uint8_t> GetVectorFromArray(const uint8_t (&macArray)[6]);   //MAC has a size of 6
 
     /// @brief Converts the Provided MAC address container to a string
     /// @tparam Iterator The iterator of the container
@@ -15,7 +15,7 @@ namespace MACTypeConverter
     /// @param end The end of the container
     /// @return The generated string address
     template <typename Iterator>
-    std::string MACTypeConverter::ToString(Iterator start, Iterator end)
+    std::string ToString(Iterator start, Iterator end)
     {
         //Template has to be in the header
         std::stringstream ss;
@@ -28,7 +28,7 @@ namespace MACTypeConverter
         }
 
         std::string result = ss.str();
-        result.pop_back();
+        result.pop_back();  //Remove trailing ':'
         return result;
     }
 }

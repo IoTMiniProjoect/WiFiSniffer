@@ -54,8 +54,6 @@ void WiFiSniffer::SetPromiscuousPacketHandlerCallbackFunction(wifi_promiscuous_c
 {
     if (callback == nullptr)
     {
-        //TODO: fix mapping
-        //m_promiscuousPacketHandler = std::bind(&WiFiSniffer::DefaultPromiscuousPacketHandler, this, _1, _2);
         m_promiscuousPacketHandler = &WiFiSniffer::DefaultPromiscuousPacketHandler;
 
     }

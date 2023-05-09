@@ -7,8 +7,6 @@
 
 namespace MACAddressUtilities
 {
-    bool IsRandomizedMAC(std::vector<uint8_t> &mac);
-    bool IsRandomizedMAC(std::string mac);
-
+    bool IsRandomizedMAC(const std::vector<uint8_t> &mac);
     std::string GetMacCollectionAsString(const std::set<std::vector<uint8_t>> &macsColletion);
 }

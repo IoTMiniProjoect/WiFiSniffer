@@ -2,7 +2,7 @@
 #include "MACTypeConverter.h"
 #include "DebugPrint.h"
 
-bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> &mac)
+bool MACAddressUtilities::IsRandomizedMAC(const std::vector<uint8_t> &mac)
 {
     uint8_t macMSB = mac[0];
     //x_2, x_6, x_A, x_E => randomized mac
@@ -16,16 +16,6 @@ bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> &mac)
 
     //Random mac address, matches the mask
     return true;
-}
-
-bool MACAddressUtilities::IsRandomizedMAC(std::string mac)
-{
-    //Needed? User can just convert themselves
-    //TODO...
-    #warning "Not implemented"
-    DEBUG_PRINTLN("[!] Not implemented");
-
-    return false;
 }
 
 std::string MACAddressUtilities::GetMacCollectionAsString(const std::set<std::vector<uint8_t>> &macsColletion)

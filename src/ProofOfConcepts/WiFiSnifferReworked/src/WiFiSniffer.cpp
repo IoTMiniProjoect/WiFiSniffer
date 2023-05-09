@@ -14,11 +14,7 @@
 std::set<std::vector<uint8_t>> WiFiSniffer::m_detectedMacs = std::set<std::vector<uint8_t>>();
 int WiFiSniffer::m_farthestRSSI = RSSIBoundry_NONE;
 int WiFiSniffer::m_closestRSSI = 0;
-std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> WiFiSniffer::m_promiscuousPacketHandler = {};
-
-
-//src-only function declarations
-void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type);
+std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> WiFiSniffer::m_promiscuousPacketHandler = {};   //Same as = nullptr
 
 /// @brief Get the instance of the singleton class
 /// @return The instance

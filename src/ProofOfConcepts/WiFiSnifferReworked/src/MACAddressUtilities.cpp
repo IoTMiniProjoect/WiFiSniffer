@@ -1,4 +1,5 @@
 #include "MACAddressUtilities.h"
+#include "MACTypeConverter.h"
 #include "DebugPrint.h"
 
 bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> &mac)
@@ -19,9 +20,29 @@ bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> &mac)
 
 bool MACAddressUtilities::IsRandomizedMAC(std::string mac)
 {
+    //Needed? User can just convert themselves
     //TODO...
-    #warning "Not implemented yet"
+    #warning "Not implemented"
     DEBUG_PRINTLN("[!] Not implemented");
 
     return false;
+}
+
+std::string MACAddressUtilities::GetMacCollectionAsString(const std::set<std::vector<uint8_t>> &macsColletion)
+{
+    std::string result = "";
+
+    if (macsColletion.size() == 0)
+    {
+        return result;
+    }
+
+    for (std::vector<uint8_t> currentMacVector : macsColletion)
+    {
+        result += MACTypeConverter::ToString(std::begin(currentMacVector), std::end(currentMacVector)) + "\n";
+    }
+
+    result.pop_back();  //Remove trailing newline
+    
+    return result;
 }

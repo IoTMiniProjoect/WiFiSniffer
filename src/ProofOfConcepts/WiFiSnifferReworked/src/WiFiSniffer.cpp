@@ -8,6 +8,14 @@
 #include "MACTypeConverter.h"
 #include "sstream"
 #include "functional"
+#include "PromiscuousPacketHandlers.h"
+
+//Static member variable definitions
+std::set<std::vector<uint8_t>> WiFiSniffer::m_detectedMacs = std::set<std::vector<uint8_t>>();
+int WiFiSniffer::m_farthestRSSI = RSSIBoundry_NONE;
+int WiFiSniffer::m_closestRSSI = 0;
+std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> WiFiSniffer::m_promiscuousPacketHandler = {};
+
 
 //src-only function declarations
 void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type);
@@ -43,26 +51,18 @@ bool WiFiSniffer::SetUp()
     DEBUG_PRINTLN("[+] esp_wifi_start");
 
     esp_wifi_set_promiscuous(true);
-    SetPromiscuousPacketHandlerCallbackFunction(nullptr);
+    esp_wifi_set_promiscuous_rx_cb(&PromisciousPacketHandlerWrapper);
+    
+    SetPromiscuousPacketHandlerCallbackFunction(&VerbosePromiscuousPacketHandler);
 
     return true;
 }
 
 /// @brief Sets the callback for receiving a promiscous packet.
 /// @param callback The address of the callback function. Pass nullptr to get the default handler
-void WiFiSniffer::SetPromiscuousPacketHandlerCallbackFunction(wifi_promiscuous_cb_t callback)
+void WiFiSniffer::SetPromiscuousPacketHandlerCallbackFunction(std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> callback)
 {
-    if (callback == nullptr)
-    {
-        m_promiscuousPacketHandler = &WiFiSniffer::DefaultPromiscuousPacketHandler;
-
-    }
-    else
-    {
-        m_promiscuousPacketHandler = callback;
-    }
-
-    esp_wifi_set_promiscuous_rx_cb(m_promiscuousPacketHandler);
+    m_promiscuousPacketHandler = callback;
 }
 
 /// @brief Sets the WiFi channel
@@ -73,39 +73,61 @@ bool WiFiSniffer::SetWiFiChannel(uint8_t channel)
     return esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE) == ESP_OK;
 }
 
-//Default handler
-void WiFiSniffer::DefaultPromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type)
+std::set<std::vector<uint8_t>> WiFiSniffer::GetDetectedMacs()
+{
+    return m_detectedMacs;
+}
+
+/// @brief Sets the RSSI detection range. 
+/// @param farthestRSSI A value less than closestRSSI, the lower the number, the farther away. Use RSSIBoundry_NONE or 0x10 for no limit.
+/// @param closestRSSI A value higher than farthestRSSI, maximum of 0.
+/// @return True on successfully setting the range, false if the parameters are wrong
+bool WiFiSniffer::SetRSSIRange(int farthestRSSI, int closestRSSI)
+{
+    if (closestRSSI > 0)
+    {
+        return false;
+    }
+
+    if (farthestRSSI > closestRSSI)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+/// @brief Wrapper for the promiscuous handler defined by the user. Provides under-the-hood-logic
+void WiFiSniffer::PromisciousPacketHandlerWrapper(void *buffer, wifi_promiscuous_pkt_type_t type)
 {
     if (type != WIFI_PKT_MGMT)
     {
         //We only care about the management frame
         return;
     }
-    
+
     const wifi_promiscuous_pkt_t *packet = (wifi_promiscuous_pkt_t *)buffer;
+    int rssi = packet->rx_ctrl.rssi;
+
+    if (rssi > m_closestRSSI || rssi < m_farthestRSSI)
+    {
+        //RSSI not within specified boundaries
+        return;
+    }
+
     const wifi_ieee80211_packet *ieee8021Packet = (wifi_ieee80211_packet *)packet->payload;
     const wifi_ieee80211_mac_hdr *header = &ieee8021Packet->hdr;
 
-#ifdef ONLY_CLOSE
-    if (packet->rx_ctrl.rssi < MAX_RSSI)
+    //Add mac to the known macs
+    m_detectedMacs.insert(MACTypeConverter::GetVectorFromArray(header->addr2));
+
+
+    //Everything is fine, we can call the worker function
+    if (m_promiscuousPacketHandler == nullptr)
     {
-        //Too far away
+        //No handler
         return;
     }
-#endif
 
-    //Note: Untested
-    std::string receiverMac = MACTypeConverter::ToString(std::begin(header->addr1), std::end(header->addr1));
-
-    std::string senderMac = MACTypeConverter::ToString(std::begin(header->addr2), std::end(header->addr2));
-
-    std::stringstream messageStream;
-    messageStream << "Timestamp: " << packet->rx_ctrl.timestamp << '\n' <<
-                     "Channel: " << packet->rx_ctrl.channel << '\n' <<
-                     "RSSI: " << packet->rx_ctrl.rssi << '\n' << 
-                     "Receiver: " << receiverMac << '\n' <<
-                     "Sender: " << senderMac;
-    
-    DEBUG_PRINTLN(messageStream.str().data());
+    m_promiscuousPacketHandler(packet, type);
 }
-

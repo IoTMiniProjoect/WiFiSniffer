@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <sstream>
+#include <iomanip>
 
 namespace MACTypeConverter
 {

@@ -1,6 +1,4 @@
 #include "MACTypeConverter.h"
-#include <sstream>
-#include <iomanip>
 
 std::vector<uint8_t> MACTypeConverter::GetVectorFromString(const std::string &macAddress)
 {

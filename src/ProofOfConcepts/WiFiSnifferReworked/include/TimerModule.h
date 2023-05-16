@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #define SECONDS * 1000
-#define MINUTES * 60 * SECONDS
+#define MINUTES * 60 SECONDS
 
 class Timer
 {

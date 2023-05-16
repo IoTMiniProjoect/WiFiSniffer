@@ -11,7 +11,7 @@
 #include "PromiscuousPacketHandlers.h"
 
 //Static member variable definitions
-std::set<std::vector<uint8_t>> WiFiSniffer::m_detectedMacs = std::set<std::vector<uint8_t>>();
+MacHandler WiFiSniffer::m_macHandler = MacHandler();
 int WiFiSniffer::m_farthestRSSI = RSSIBoundry_NONE;
 int WiFiSniffer::m_closestRSSI = 0;
 std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> WiFiSniffer::m_promiscuousPacketHandler = {};   //Same as = nullptr
@@ -69,11 +69,6 @@ bool WiFiSniffer::SetWiFiChannel(uint8_t channel)
     return esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE) == ESP_OK;
 }
 
-std::set<std::vector<uint8_t>> WiFiSniffer::GetDetectedMacs()
-{
-    return m_detectedMacs;
-}
-
 /// @brief Sets the RSSI detection range. 
 /// @param farthestRSSI A value less than closestRSSI, the lower the number, the farther away. Use RSSIBoundry_NONE or 0x10 for no limit.
 /// @param closestRSSI A value higher than farthestRSSI, maximum of 0.
@@ -107,18 +102,25 @@ void WiFiSniffer::PromisciousPacketHandlerWrapper(void *buffer, wifi_promiscuous
 
     if (rssi > m_closestRSSI || rssi < m_farthestRSSI)
     {
-        //RSSI not within specified boundaries
-        return;
+        if (m_farthestRSSI != RSSIBoundry_NONE)
+        {
+            //RSSI not within specified boundaries
+            return;
+        }
     }
-
+    
     const wifi_ieee80211_packet *ieee8021Packet = (wifi_ieee80211_packet *)packet->payload;
     const wifi_ieee80211_mac_hdr *header = &ieee8021Packet->hdr;
 
     //Add mac to the known macs
-    m_detectedMacs.insert(MACTypeConverter::GetVectorFromArray(header->addr2));
+    m_macHandler.AddOrUpdateMacInfo(MacData(
+        MACTypeConverter::GetVectorFromArray(header->addr2),
+        packet->rx_ctrl.timestamp,
+        packet->rx_ctrl.channel,
+        rssi
+    ));
 
-
-    //Everything is fine, we can call the worker function
+    //Everything is fine, we can call the custom handler function
     if (m_promiscuousPacketHandler == nullptr)
     {
         //No handler
@@ -126,4 +128,24 @@ void WiFiSniffer::PromisciousPacketHandlerWrapper(void *buffer, wifi_promiscuous
     }
 
     m_promiscuousPacketHandler(packet, type);
+}
+
+/// @brief To be called every cycle, contains logic that needs to be executed every cycle
+void WiFiSniffer::Handle() const
+{
+    m_macHandler.Handle();
+}
+
+/// @brief Gets the current number of macs detected
+/// @return The current number of macs detected
+int WiFiSniffer::GetCurrentMacsCount() const
+{
+    return m_macHandler.GetMacCount();
+}
+
+/// @brief Gets all data for the active mac addresses (in a pretty way (◕‿◕✿))
+/// @return The string containing the data
+std::string WiFiSniffer::GetDetectedMacDataAsPrettyString() const
+{
+    return m_macHandler.GetDataAsPrettyString();
 }

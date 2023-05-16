@@ -6,14 +6,14 @@
 #include <functional>
 #include "esp_wifi.h"
 #include "CustomWiFiStructs.h"
+#include "MacHandler.h"
 
 #define RSSIBoundry_NONE 0x10
 
-class WiFiSniffer
+class WiFiSniffer final
 {
     private:
         static std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> m_promiscuousPacketHandler;
-        static std::set<std::vector<uint8_t>> m_detectedMacs;
 
         //Disalow outside creation
         WiFiSniffer() = default;
@@ -23,7 +23,7 @@ class WiFiSniffer
         static int m_farthestRSSI;
         static int m_closestRSSI;
 
-        //TODO: Add a MAC Handler class?
+        static MacHandler m_macHandler;
     
     public:
         WiFiSniffer(WiFiSniffer &other) = delete;
@@ -33,8 +33,12 @@ class WiFiSniffer
         static WiFiSniffer& Instance();
 
         bool SetUp();
+        void Handle() const;
+        
         void SetPromiscuousPacketHandlerCallbackFunction(std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> callback);
         bool SetWiFiChannel(uint8_t channel);
-        static std::set<std::vector<uint8_t>> GetDetectedMacs();
         bool SetRSSIRange(int farthestRSSI, int closestRSSI = 0);
+        
+        int GetCurrentMacsCount() const;
+        std::string GetDetectedMacDataAsPrettyString() const;
 };

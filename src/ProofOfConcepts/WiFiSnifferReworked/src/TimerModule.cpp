@@ -8,6 +8,8 @@ Timer::Timer(uint32_t durationMs)
     m_isEnabled = false;
 }
 
+/// @brief Determines if the timer is elapsed or not
+/// @return True if the timer has elapsed OR if it is disabled, false if it is still running
 bool Timer::Elapsed()
 {
     if (!IsEnabled())

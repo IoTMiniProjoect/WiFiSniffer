@@ -6,10 +6,6 @@
 #include "DebugPrint.h"
 #include "PromiscuousPacketHandlers.h"
 
-//Undefine to show all devices
-//#define ONLY_CLOSE 
-//#define MAX_RSSI -30    //The lower the number, the closer the device is
-
 WiFiSniffer &Sniffer = WiFiSniffer::Instance();
 Timer printTimer = Timer(5 SECONDS);
 

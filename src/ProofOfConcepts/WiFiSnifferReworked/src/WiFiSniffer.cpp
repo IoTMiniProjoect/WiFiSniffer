@@ -131,7 +131,7 @@ void WiFiSniffer::PromisciousPacketHandlerWrapper(void *buffer, wifi_promiscuous
 }
 
 /// @brief To be called every cycle, contains logic that needs to be executed every cycle
-void WiFiSniffer::Handle() const
+void WiFiSniffer::Handle()
 {
     m_macHandler.Handle();
 }

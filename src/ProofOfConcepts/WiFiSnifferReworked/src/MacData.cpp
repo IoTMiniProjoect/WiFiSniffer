@@ -21,6 +21,8 @@ MacData& MacData::operator=(const MacData &rVal)
     return *this;
 }
 
+/// @brief Converts the mac data to string, every item is separated by " || "
+/// @return The output string
 std::string MacData::ToString()
 {
     std::string result =  "";
@@ -32,6 +34,8 @@ std::string MacData::ToString()
     return result;
 }
 
+/// @brief Determines if the mac inside the struct is randomized
+/// @return True if its randomized, false otherwise
 bool MacData::IsRandomizedMac()
 {
     return MACAddressUtilities::IsRandomizedMAC(macAddress);

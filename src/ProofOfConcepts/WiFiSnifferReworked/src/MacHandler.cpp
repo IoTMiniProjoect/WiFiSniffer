@@ -145,7 +145,7 @@ int MacHandler::GetMacIndex(const std::vector<uint8_t> &macAddress) const
 }
 
 /// @brief Gets all data a pretty string
-/// @return 
+/// @return The output string
 std::string MacHandler::GetDataAsPrettyString() const
 {
     std::string result = "";

@@ -33,7 +33,7 @@ class WiFiSniffer final
         static WiFiSniffer& Instance();
 
         bool SetUp();
-        void Handle() const;
+        void Handle();
         
         void SetPromiscuousPacketHandlerCallbackFunction(std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> callback);
         bool SetWiFiChannel(uint8_t channel);

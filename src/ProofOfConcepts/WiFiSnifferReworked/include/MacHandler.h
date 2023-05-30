@@ -16,7 +16,6 @@ class MacHandler
         
         void AddMacInfo(const MacData &macData);
         void UpdateMacInfo(int index, const MacData &newMacData);
-        //bool RemoveMacInfo(const std::vector<uint8_t> &macAddress);
         bool RemoveMacInfo(int index);
         void RemoveTimedOutMacs(uint32_t currentTimestamp);
         bool IsValidIndex(int index) const;

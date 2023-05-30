@@ -2,6 +2,9 @@
 #include "MACTypeConverter.h"
 #include "DebugPrint.h"
 
+/// @brief Determines if a MAC address is randomized or not
+/// @param mac The MAC address to check
+/// @return True if the MAC is randomized, false otherwise
 bool MACAddressUtilities::IsRandomizedMAC(const std::vector<uint8_t> &mac)
 {
     uint8_t macMSB = mac[0];
@@ -18,6 +21,9 @@ bool MACAddressUtilities::IsRandomizedMAC(const std::vector<uint8_t> &mac)
     return true;
 }
 
+/// @brief Converts a vector containing multiple MAC vectors into a string with every item separated by a newline
+/// @param macsColletion The mac collection to convert to string
+/// @return The resulting string.
 std::string MACAddressUtilities::GetMacCollectionAsString(const std::set<std::vector<uint8_t>> &macsColletion)
 {
     std::string result = "";

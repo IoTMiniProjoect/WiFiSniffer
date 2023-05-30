@@ -10,7 +10,7 @@ struct MacData
     uint32_t timestamp;
     uint8_t channel;
     int rssi;
-
+    
     MacData() = default;
     MacData(std::vector<uint8_t> macAddress, uint32_t timestamp, uint8_t channel, int rssi);
 

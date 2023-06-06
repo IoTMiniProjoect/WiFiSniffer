@@ -1,10 +1,11 @@
 #include "MacHandler.h"
 #include "VectorManipulator.h"
+#include "DebugPrint.h"
 
 MacHandler::MacHandler()
 {
-    m_macTimeoutMs = 10 MINUTES;
-    m_timeoutCheckIntervalMs = 10 SECONDS;
+    SetMacTimeout(10 MINUTES);
+    SetTimeoutCheckInterval(10 SECONDS);
     m_macValidityCheckTimer = Timer(m_timeoutCheckIntervalMs);
 
     m_macValidityCheckTimer.Start();
@@ -17,6 +18,8 @@ void MacHandler::Handle()
     if (m_macValidityCheckTimer.Elapsed())
     {
         RemoveTimedOutMacs(millis());
+
+        m_macValidityCheckTimer.Start();
     }
 }
 
@@ -61,8 +64,8 @@ uint32_t MacHandler::GetMacCount() const
 }
 
 /// @brief Removes the MAC info with the given index
-/// @param index 
-/// @return 
+/// @param index The index of the mac address to remove
+/// @return True on success, false otherwise
 bool MacHandler::RemoveMacInfo(int index)
 {
     if (!IsValidIndex(index))
@@ -80,10 +83,10 @@ void MacHandler::RemoveTimedOutMacs(uint32_t currentTimestamp)
 {
     std::vector<int> indeciesToRemove;
 
+    int currentIndex = 0;
+
     for (MacData data : m_macDataVector)
     {
-        static int currentIndex = 0;
-
         uint32_t differenceOfDataTimeToMaxValue = UINT32_MAX - data.timestamp;
         uint32_t actualDifference = differenceOfDataTimeToMaxValue + currentTimestamp + 1; //+1 because 0 counts as a number too when overflowing
 

@@ -10,6 +10,7 @@
 
 #define RSSIBoundry_NONE 0x10
 
+
 class WiFiSniffer final
 {
     private:
@@ -38,7 +39,9 @@ class WiFiSniffer final
         void SetPromiscuousPacketHandlerCallbackFunction(std::function<void(const wifi_promiscuous_pkt_t *packet, wifi_promiscuous_pkt_type_t type)> callback);
         bool SetWiFiChannel(uint8_t channel);
         bool SetRSSIRange(int farthestRSSI, int closestRSSI = 0);
+        static void SetMacTimeout(uint32_t timeoutMs);
         
         int GetCurrentMacsCount() const;
         std::string GetDetectedMacDataAsPrettyString() const;
+
 };

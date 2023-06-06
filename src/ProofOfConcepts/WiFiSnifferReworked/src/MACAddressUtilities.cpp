@@ -20,25 +20,3 @@ bool MACAddressUtilities::IsRandomizedMAC(const std::vector<uint8_t> &mac)
     //Random mac address, matches the mask
     return true;
 }
-
-/// @brief Converts a vector containing multiple MAC vectors into a string with every item separated by a newline
-/// @param macsColletion The mac collection to convert to string
-/// @return The resulting string.
-std::string MACAddressUtilities::GetMacCollectionAsString(const std::set<std::vector<uint8_t>> &macsColletion)
-{
-    std::string result = "";
-
-    if (macsColletion.size() == 0)
-    {
-        return result;
-    }
-
-    for (std::vector<uint8_t> currentMacVector : macsColletion)
-    {
-        result += MACTypeConverter::ToString(std::begin(currentMacVector), std::end(currentMacVector)) + "\n";
-    }
-
-    result.pop_back();  //Remove trailing newline
-    
-    return result;
-}

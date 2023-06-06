@@ -27,7 +27,7 @@ class MacHandler
         void Handle();
 
         void AddOrUpdateMacInfo(const MacData &macData);
-        void SetMacTimeout(uint32_t timeout);
+        void SetMacTimeout(uint32_t timeoutMs);
         void SetTimeoutCheckInterval(uint32_t checkIntervalMs);
 
         uint32_t GetMacCount() const;

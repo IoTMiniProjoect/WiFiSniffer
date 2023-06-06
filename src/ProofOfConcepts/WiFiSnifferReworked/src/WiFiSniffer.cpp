@@ -10,6 +10,9 @@
 #include "functional"
 #include "PromiscuousPacketHandlers.h"
 
+
+#include "WiFi.h"
+
 //Static member variable definitions
 MacHandler WiFiSniffer::m_macHandler = MacHandler();
 int WiFiSniffer::m_farthestRSSI = RSSIBoundry_NONE;
@@ -40,7 +43,9 @@ bool WiFiSniffer::SetUp()
     ESP_ERROR_CHECK(esp_wifi_set_country(&wifiCountry));
     DEBUG_PRINTLN("[+] esp_wifi_set_country");
 
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_NULL));
+    //ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_NULL));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    WiFi.softAP("beacon");
     DEBUG_PRINTLN("[+] esp_wifi_set_mode");
 
     ESP_ERROR_CHECK(esp_wifi_start());
@@ -79,11 +84,14 @@ bool WiFiSniffer::SetRSSIRange(int farthestRSSI, int closestRSSI)
     {
         return false;
     }
-
+    //0E:3F:D3:81:F0:71
     if (farthestRSSI > closestRSSI)
     {
         return false;
     }
+
+    m_farthestRSSI = farthestRSSI;
+    m_closestRSSI = closestRSSI;
 
     return true;
 }
@@ -115,7 +123,7 @@ void WiFiSniffer::PromisciousPacketHandlerWrapper(void *buffer, wifi_promiscuous
     //Add mac to the known macs
     m_macHandler.AddOrUpdateMacInfo(MacData(
         MACTypeConverter::GetVectorFromArray(header->addr2),
-        packet->rx_ctrl.timestamp,
+        millis(),
         packet->rx_ctrl.channel,
         rssi
     ));
@@ -141,6 +149,13 @@ void WiFiSniffer::Handle()
 int WiFiSniffer::GetCurrentMacsCount() const
 {
     return m_macHandler.GetMacCount();
+}
+
+/// @brief Set the amount of time to keep a MAC in the list before it is deleted
+/// @param timeout The timeout, in milliseconds
+void WiFiSniffer::SetMacTimeout(uint32_t timeoutMs)
+{
+    m_macHandler.SetMacTimeout(timeoutMs);
 }
 
 /// @brief Gets all data for the active mac addresses (in a pretty way (◕‿◕✿))

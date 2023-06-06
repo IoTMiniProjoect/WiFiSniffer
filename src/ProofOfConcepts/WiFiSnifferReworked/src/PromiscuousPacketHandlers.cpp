@@ -14,7 +14,8 @@ void VerbosePromiscuousPacketHandler(const wifi_promiscuous_pkt_t *packet, wifi_
     //addr1 -> receiver (esp), addr2 -> sender
     std::vector<uint8_t> senderMac = MACTypeConverter::GetVectorFromArray(header->addr2);
 
-    MacData data = MacData(senderMac, packet->rx_ctrl.timestamp, packet->rx_ctrl.channel, packet->rx_ctrl.rssi);
+    // MacData data = MacData(senderMac, packet->rx_ctrl.timestamp, packet->rx_ctrl.channel, packet->rx_ctrl.rssi);
+    MacData data = MacData(senderMac, millis(), packet->rx_ctrl.channel, packet->rx_ctrl.rssi);
 
     DEBUG_PRINTLN(data.ToString().c_str());
 }

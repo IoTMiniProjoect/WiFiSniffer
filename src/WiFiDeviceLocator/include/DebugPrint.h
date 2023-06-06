@@ -1,7 +1,8 @@
 #pragma once
+#include "Arduino.h"
 
 //Uncomment or define somewhere else to see debug messages
-//#define DEBUG_MODE
+#define DEBUG_MODE
 
 #ifdef DEBUG_MODE
     #define DEBUG_PRINT(message) Serial.print(message)

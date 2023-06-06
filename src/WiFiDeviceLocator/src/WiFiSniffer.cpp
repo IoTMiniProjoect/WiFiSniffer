@@ -164,3 +164,8 @@ std::string WiFiSniffer::GetDetectedMacDataAsPrettyString() const
 {
     return m_macHandler.GetDataAsPrettyString();
 }
+
+std::vector<MacData> WiFiSniffer::GetMacDataAsVector() const
+{
+    return m_macHandler.GetDataAsVector();
+}

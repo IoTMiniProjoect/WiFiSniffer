@@ -33,4 +33,5 @@ class MacHandler
         uint32_t GetMacCount() const;
         int GetMacIndex(const std::vector<uint8_t> &macAddress) const;
         std::string GetDataAsPrettyString() const;
+        std::vector<MacData> GetDataAsVector() const;
 };

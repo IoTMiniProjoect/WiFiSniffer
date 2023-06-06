@@ -43,5 +43,6 @@ class WiFiSniffer final
         
         int GetCurrentMacsCount() const;
         std::string GetDetectedMacDataAsPrettyString() const;
-
+        std::vector<MacData> GetMacDataAsVector() const;
+        
 };

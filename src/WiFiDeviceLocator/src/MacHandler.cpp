@@ -161,3 +161,9 @@ std::string MacHandler::GetDataAsPrettyString() const
     result.pop_back();  //Remove trailing \n
     return result;
 }
+
+// Does returning a const add any benefit? Yes, it creates a headache
+std::vector<MacData> MacHandler::GetDataAsVector() const
+{
+    return m_macDataVector;
+}

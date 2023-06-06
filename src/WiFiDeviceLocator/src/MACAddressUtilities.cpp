@@ -1,7 +1,11 @@
 #include "MACAddressUtilities.h"
+#include "MACTypeConverter.h"
 #include "DebugPrint.h"
 
-bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> mac)
+/// @brief Determines if a MAC address is randomized or not
+/// @param mac The MAC address to check
+/// @return True if the MAC is randomized, false otherwise
+bool MACAddressUtilities::IsRandomizedMAC(const std::vector<uint8_t> &mac)
 {
     uint8_t macMSB = mac[0];
     //x_2, x_6, x_A, x_E => randomized mac
@@ -15,13 +19,4 @@ bool MACAddressUtilities::IsRandomizedMAC(std::vector<uint8_t> mac)
 
     //Random mac address, matches the mask
     return true;
-}
-
-bool MACAddressUtilities::IsRandomizedMAC(std::string mac)
-{
-    //TODO...
-    #warning "Not implemented yet"
-    DEBUG_PRINTLN("[!] Not implemented");
-
-    return false;
 }

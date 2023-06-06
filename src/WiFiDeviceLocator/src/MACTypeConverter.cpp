@@ -1,7 +1,8 @@
 #include "MACTypeConverter.h"
-#include <sstream>
-#include <iomanip>
 
+/// @brief Gets a MAC vector from a mac in a string. The mac octets are separted by a ':'.
+/// @param macAddress The string to convert to a mac vector 
+/// @return The mac vector
 std::vector<uint8_t> MACTypeConverter::GetVectorFromString(const std::string &macAddress)
 {
     std::stringstream stringStream(macAddress);
@@ -16,18 +17,12 @@ std::vector<uint8_t> MACTypeConverter::GetVectorFromString(const std::string &ma
     return macVector;
 }
 
-std::string MACTypeConverter::GetStringFromVector(const std::vector<uint8_t> &macAddress)
+/// @brief Gets a Mac vector from a mac array
+/// @param macArray The mac array to convert to a vector
+/// @return The resulting vector
+std::vector<uint8_t> MACTypeConverter::GetVectorFromArray(const uint8_t (&macArray)[6])
 {
-    std::stringstream ss;
-
-    ss << std::hex << std::setfill('0');
-
-    for (int i = 0; i < macAddress.size(); i++)
-    {
-        ss << std::uppercase << std::hex << std::setw(2) << static_cast<int>(macAddress[i]) << ':';
-    }
-
-    std::string result = ss.str();
-    result.pop_back();
-    return result;
+    std::vector<uint8_t> macVector = std::vector<uint8_t>(std::begin(macArray), std::end(macArray));
+    
+    return macVector;
 }

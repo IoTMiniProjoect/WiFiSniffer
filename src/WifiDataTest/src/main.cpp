@@ -22,22 +22,17 @@
 const char* SSID     = "12connect";
 const char* PASSWORD = "";
 
-const char* ntpServer = "europe.pool.ntp.org";
-const long  gmtOffset_sec = 0;
-const int   daylightOffset_sec = 3600;
+
 
 bool messageArrived = false;
 
-std::string nameString = "ESP3";
-std::string timeString = "";
-std::string receiverString = "";
-std::string senderString = "";
-int channel = 0;
-int RSSI = 0;
+
 
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
+
+
 
 // Structs
 //Note: original uses bitfields
@@ -68,36 +63,9 @@ struct wifi_ieee80211_packet
 	uint8_t payload[0]; /* network data ended with 4 bytes csum (CRC32) */ 
 };
 
-EspMQTTClient client(
-  SSID,
-  PASSWORD,
-  "test.mosquitto.org", // MQTT Broker
-  "",   // Can be omitted if not needed
-  "",   // Can be omitted if not needed
-  "",     // Client name that uniquely identify your device
-  1883              // The MQTT port, default to 1883. this line can be omitted
-);
-
 //Function declarations
 void setup_alt();
 void PromiscuousPacketHandler(void *buffer, wifi_promiscuous_pkt_type_t type);
-
-std::string GetLocalTime()
-{
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo))
-  {
-    Serial.println("Failed to obtain time\n");
-    return "";
-  }
-  std::stringstream timeStream;
-  timeStream << timeinfo.tm_hour + 1;
-  timeStream << ':';
-  timeStream << timeinfo.tm_min;
-  timeStream << ':';
-  timeStream << timeinfo.tm_sec;
-  return timeStream.str();
-}
 
 
 void ReadPacketsTask(void* parameter)
@@ -124,21 +92,67 @@ void ReadPacketsTask(void* parameter)
     }
 }
 
+#pragma region WIFI
+
+std::string nameString = "ESP3";
+std::string timeString = "";
+std::string receiverString = "";
+std::string senderString = "";
+int channel = 0;
+int RSSI = 0;
+
+EspMQTTClient client(
+  SSID,
+  PASSWORD,
+  "test.mosquitto.org", // MQTT Broker
+  "",   // Can be omitted if not needed
+  "",   // Can be omitted if not needed
+  "",     // Client name that uniquely identify your device
+  1883              // The MQTT port, default to 1883. this line can be omitted
+);
+
+const char* ntpServer = "europe.pool.ntp.org";
+const long  gmtOffset_sec = 0;
+const int   daylightOffset_sec = 3600;
+
+std::string GetLocalTime()
+{
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo))
+    {
+        Serial.println("Failed to obtain time\n");
+        return "";
+    }
+    std::stringstream timeStream;
+    timeStream << timeinfo.tm_hour + 1;
+    timeStream << ':';
+    timeStream << timeinfo.tm_min;
+    timeStream << ':';
+    timeStream << timeinfo.tm_sec;
+    return timeStream.str();
+}
+
 void WifiTask(void* parameter)
 {
+    //WiFi Setup
+    //NOTE: possible failing point
     WiFi.begin(SSID,PASSWORD);
 
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     GetLocalTime();
-    WiFi.mode(WIFI_AP);
+    WiFi.mode(WIFI_AP); //Remove, already set in WiFiSniffer
+
+    //WiFi Loop
     for(;;)
     {
-        timeString = GetLocalTime();
-        if (messageArrived == true)
+        timeString = GetLocalTime();    //TODO: Move this inside the if() to prevent unnecessary calls?
+        if (messageArrived == true) //TODO: Replace with your own print timer
         {
-            messageArrived = false;
+            messageArrived = false; //TODO: replace with timer.Start()
             char mqttBuf[BUF_LEN];
-            StaticJsonDocument<BUF_LEN> doc;
+            StaticJsonDocument<BUF_LEN> doc;    //Move as global for optimization and do doc.clear(); ?
+
+            //TODO: Extract to method
             doc["Name"] = nameString;
             doc["Time"] = timeString;
             doc["Channel"] = channel;
@@ -156,8 +170,10 @@ void WifiTask(void* parameter)
 void setup()
 {
     Serial.begin(115200);
+    
     xTaskCreatePinnedToCore(WifiTask, "MQTT", 4000, NULL, 1, &Task1, 1);
     delay(500);
+    //TODO: Implement the other sniffer here
     xTaskCreatePinnedToCore(ReadPacketsTask, "Packets", 2000, NULL, 1, &Task2, 0);
 }
 

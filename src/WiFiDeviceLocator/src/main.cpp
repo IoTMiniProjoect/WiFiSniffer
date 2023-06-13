@@ -15,8 +15,8 @@
 std::mutex macManipulationgMutex;
 std::vector<MacData> macData;
 
-//Has to be in the file scope cus of the stupid onConnectionEstablished
-EspMQTTClient mqttClient = EspMQTTClient(SSID, PASSWORD, MQTT_BROKER, "", "", "", MQTT_PORT);
+//Has to be in the file scope cus of onConnectionEstablished()
+EspMQTTClient mqttClient = EspMQTTClient(WIFI_SSID, WIFI_PASSWORD, MQTT_BROKER, "", "", "", MQTT_PORT);
 
 
 TaskHandle_t snifferTaskHandle;
@@ -77,7 +77,7 @@ void MqttThread(void *parameter)
     RealTime realTime;
     Timer mqttDataSendTimer = Timer(10 SECONDS);    //Change if needed
 
-    MQTTHandler mqttHandler = MQTTHandler(SSID, PASSWORD, realTime, mqttClient, mqttDataSendTimer);
+    MQTTHandler mqttHandler = MQTTHandler(WIFI_SSID, WIFI_PASSWORD, realTime, mqttClient, mqttDataSendTimer);
     
     //Note: Are prints thread-safe?
     DEBUG_PRINTLN("[+] MQTT setup complete");

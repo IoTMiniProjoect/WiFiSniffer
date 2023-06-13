@@ -8,8 +8,8 @@
 #define WIFI_CHANNEL 1
 
 #warning Insert valid wifi credentials
-#define SSID "insert"
-#define PASSWORD "password"
+#define WIFI_SSID "insert"
+#define WIFI_PASSWORD "password"
 
 extern std::mutex macManipulationgMutex;    //Used for locking macData
 extern std::vector<MacData> macData; //Vector containing the most-recently updated mac data

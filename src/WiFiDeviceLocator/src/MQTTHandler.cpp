@@ -4,6 +4,7 @@
 #include "GlobalVariables.h"
 #include <thread>
 #include <mutex>
+#include "MACTypeConverter.h"
 
 MQTTHandler::MQTTHandler(const char *ssid, const char *password, RealTime &realTimeHandler, EspMQTTClient &client, Timer &sendTimer) : m_realTimeHandler(realTimeHandler), m_client(client), m_sendTimer(sendTimer)
 {
@@ -46,10 +47,9 @@ void MQTTHandler::SendData()
         doc["Channel"] = data.channel;
         doc["RSSI"] = data.rssi;
         doc["Receiver"] = DEVICE_NAME; //Note: Not saved, just pass DEVICE_NAME for now. Remove if it causes issues with node-red
-        doc["Sender"] = data.macAddress;
+        doc["Sender"] = MACTypeConverter::ToString(data.macAddress.begin(), data.macAddress.end());
         //optional
-        doc["Randomized"] = data.IsRandomizedMac();
-
+        //doc["Randomized"] = data.IsRandomizedMac();
         serializeJson(doc, mqttBuffer);
         m_client.publish("Wifisniffer/data", mqttBuffer);
     }

@@ -74,8 +74,9 @@ TaskHandle_t mqttTaskHandle;
 
 void MqttThread(void *parameter)
 {
-    RealTime realTime;
+    RealTime realTime = RealTime();
     Timer mqttDataSendTimer = Timer(10 SECONDS);    //Change if needed
+
 
     MQTTHandler mqttHandler = MQTTHandler(WIFI_SSID, WIFI_PASSWORD, realTime, mqttClient, mqttDataSendTimer);
     
@@ -94,7 +95,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    xTaskCreatePinnedToCore(&SnifferThread, "Sniffer", 4000 /*Too much/little?*/, NULL, 1, &snifferTaskHandle, 0);
+    //xTaskCreatePinnedToCore(&SnifferThread, "Sniffer", 4000 /*Too much/little?*/, NULL, 1, &snifferTaskHandle, 0);
     xTaskCreatePinnedToCore(&MqttThread, "Sniffer", 4000 /*Too much/little?*/, NULL, 1, &mqttTaskHandle, 1);
 }
 

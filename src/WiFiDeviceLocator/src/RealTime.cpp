@@ -2,6 +2,11 @@
 #include <sstream>  //Note: Remove if too beefy
 #include "DebugPrint.h"
 #include <time.h>
+#include <cstring>
+
+#define NTP_SERVER "europe.pool.ntp.org"
+#define GMT_OFFSET_SEC 0
+#define DAYLIGHT_OFFSET_SEC 3600
 
 RealTime::RealTime() : RealTime(NTP_SERVER, GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC) { }
 
